@@ -1,0 +1,116 @@
+#:import toast kivymd.toast.toast
+
+<DrawerClickableItem@MDNavigationDrawerItem>
+    theme_text_color: 'Custom'
+    focus_color: "#326cc975"
+    ripple_color: "#134594"
+    tex_color: "#203E6DD9"
+    radius: '18dp'
+
+<DrawerLabelItem@MDNavigationDrawerItem>
+    text_size: '9sp'
+    tex_color: "#6496e8"
+    icon_color: "#6496e8"
+    focus_behavior: False
+    selected_color: "#8C8412"
+    _no_ripple_effect: True
+
+
+<HomeScreen>:
+    BoxLayout:
+        size_hint_y: None
+        orientation: 'vertical'
+        height: self.minimum_height
+        pos_hint: {'top': 1}
+        MDTopAppBar:
+            id: top_app_bar
+            title: "Eco Leitura"
+            anchor_title: 'left'
+            left_action_items: [['menu', lambda x: root.open_nav_drawer(), "Menu", "Menu"]]
+
+        TextInput:
+            id: text_input
+            pos_hint: {'top': .86999}
+            hint_text: 'Digite aqui'
+            font_size: '21sp'
+            padding: '10dp', '10dp'
+            size_hint_y: None
+            height: '300dp'
+            cursor_color: '#00e5ff'
+            background_color: 0, 0, 0, 0
+            canvas.before:
+                Color
+                    rgba:  .42, .42, .42, .75
+                RoundedRectangle:
+                    size: self.size
+                    pos: self.pos
+                    radius: [0, 0, 75, 75]
+
+    MDLabel:
+        id: language_identifier
+        height: '5dp'
+        halign: 'center'
+        font_style: 'Caption'
+        size_hint: None, None
+        width: play_button.width
+        theme_text_color: 'Custom'
+        pos_hint: {'right': .97, 'y': .15}
+        text_color: 'black'
+
+    MDFloatingActionButton:
+        id: play_button
+        icon: 'volume-high'
+        pos_hint: {'right': .97, 'y': .02}
+        icon_size: '42sp'
+        elevation: 3
+        md_bg_color: top_app_bar.md_bg_color
+        on_release: root.play_text()
+
+    MDScreen:
+        MDNavigationDrawer
+            id: nav_drawer
+            opening_time: .5
+            closing_time: .37
+            hovering: True
+            radius: (0, 21, 21, 0)
+            overlay_color: [1, 1, 1, 1]
+
+            MDNavigationDrawerMenu:
+                spacing: '9dp'
+                MDNavigationDrawerHeader:
+                    title: "Eco Leitura"
+                    text: "Menu"
+                    spacing: "4dp"
+                    padding: "12dp", 0, 0, "56dp"
+                    # title_color: top_app_bar.specific_text_color
+
+                DrawerClickableItem:
+                    id: change_language:
+                    icon: 'web'
+                    text: 'Mudar idioma'
+                    on_release: root.show_list_bottom_sheet()
+                    # selected_color: top_app_bar.specific_text_color
+
+                DrawerClickableItem:
+                    id: save_button
+                    icon: "content-save"
+                    text: "Salvar áudio"
+                    on_release: toast("Ainda estamos a trabalhar nisto")  # root.callback_for_saved_audio()
+
+                MDBoxLayout:
+                    size_hint: None, None
+                    padding: '15dp', 0
+                    MDLabel:
+                        id: color_label
+                        text: "Modo Escuro"
+                        theme_text_color: 'Custom'
+                        size_hint_x: None
+                        width: nav_drawer.width - (switch_color.width * 3)
+                    MDSwitch:
+                        id: switch_color
+                        text: 'Dark Mode'
+                        on_active: toast("Ainda estamos a trabalhar nisto")  # app.on_dark_mode_active()
+                        thumb_color_inactive: 'gray'
+                        pos_hint_right: '1'
+
+                MDNavigationDrawerDivider:
