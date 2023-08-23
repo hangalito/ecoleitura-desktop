@@ -3,6 +3,7 @@ from gtts import (
     gTTS,
     gTTSError
 )
+from pathlib import Path
 from kivymd.app import MDApp
 from kivymd.toast import toast
 from kivymd.uix.dialog import MDDialog
@@ -20,7 +21,7 @@ class HomeScreen(MDFloatLayout):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.data_path = MDApp.get_running_app().user_data_dir + '/'
+        self.data_path = Path(MDApp.get_running_app().user_data_dir)
         self.selected_idiom = self.idiom_code = None
         self.old_text = self.old_lang = ''
 
@@ -90,8 +91,6 @@ class HomeScreen(MDFloatLayout):
         def load_audio():
             pygame.mixer_music.load(f"{self.data_path}{audio}")
             pygame.mixer_music.play()
-            # sound = SoundLoader.load(f"{self.data_path}{audio}")
-            # sound.play()
 
         lang = self.get_lang_code()
         text = self.ids.text_input.text.strip()
@@ -136,11 +135,92 @@ class HomeScreen(MDFloatLayout):
         if self.dialog:
             self.dialog.dismiss()
 
+    def callback_for_saved_audio(self, *args):
+        audio_file: Path = self.data_path.joinpath(audio)
+        user_path: Path = Path.home().joinpath("Eco Leitura")
+        if Path.exists(user_path):
+            Path.rename(
+             audio_file,
+             user_path.joinpath(audio)
+            )
+        else:
+            toast("Não há nada para salvar")
+
 
 class EcoLeitura(MDApp):
-    def build(self):
+    screen = path = None
+
+    def build(self) -> object:
         self.theme_cls.material_style = 'M3'
-        return HomeScreen()
+        self.path = Path(self.user_data_dir)
+        self.screen = HomeScreen()
+        return self.screen
+
+    def on_start(self) -> None:
+        super().on_start()
+        self.screen.ids.language_identifier.text = self.load_language()
+        if self.load_theme() is True:
+            self.screen.ids.switch_color.active = True
+            self.set_dark_theme()
+    
+    def on_stop(self):
+        super().on_stop()
+        language_file = self.path.joinpath("language")
+        theme_file = self.path.joinpath("theme")
+
+        language = self.screen.ids.language_identifier.text
+        theme = str(self.screen.ids.switch_color.active)
+
+        # Save the language
+        with open(language_file, 'w') as file:
+            file.write(language)
+        
+        # Save the theme 
+        with open(theme_file, 'w') as file:
+            file.write(theme)
+
+    def load_language(self, *args) -> str:
+        file = self.path.joinpath("language")
+        try:
+            with open(file, 'r') as file:
+                language = file.read()
+                if not language:
+                    language = 'Português'
+            return language
+        except FileNotFoundError:
+            Path.touch(file)
+            self.load_language()
+
+    def load_theme(self, *args):
+        file = self.path.joinpath('theme')
+        value = None
+        try:
+            with open(file, 'r') as file:
+                theme = file.read()
+                if theme == 'True':
+                    value = True
+                else:
+                    value = False
+            return value
+        except FileNotFoundError:
+            Path.touch(file)
+            self.load_theme()
+
+    def set_dark_theme(self, *args):
+        if self.screen.ids.switch_color.active:
+            self.theme_cls.theme_style = "Dark"
+            self.screen.ids.drawer_menu_title.title_color = "#FFFFFF"
+            self.screen.ids.color_label.text_color = self.screen.ids.drawer_menu_title.title_color
+            self.screen.ids.save_button.text_color = self.screen.ids.drawer_menu_title.title_color
+            self.screen.ids.change_language.text_color = self.screen.ids.drawer_menu_title.title_color
+            self.screen.ids.language_identifier.text_color = self.screen.ids.drawer_menu_title.title_color
+        else:
+            self.theme_cls.theme_style = "Light"
+            self.screen.ids.drawer_menu_title.title_color = "#333333"
+            self.screen.ids.color_label.text_color = self.screen.ids.drawer_menu_title.title_color
+            self.screen.ids.save_button.text_color = self.screen.ids.drawer_menu_title.title_color
+            self.screen.ids.change_language.text_color = self.screen.ids.drawer_menu_title.title_color
+            self.screen.ids.language_identifier.text_color = self.screen.ids.drawer_menu_title.title_color
 
 
 if __name__ == '__main__':

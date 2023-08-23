@@ -35,7 +35,7 @@
             font_size: '21sp'
             padding: '10dp', '10dp'
             size_hint_y: None
-            height: '300dp'
+            height: root.height * .5
             cursor_color: '#00e5ff'
             background_color: 0, 0, 0, 0
             canvas.before:
@@ -78,14 +78,14 @@
             MDNavigationDrawerMenu:
                 spacing: '9dp'
                 MDNavigationDrawerHeader:
+                    id: drawer_menu_title
                     title: "Eco Leitura"
                     text: "Menu"
                     spacing: "4dp"
                     padding: "12dp", 0, 0, "56dp"
-                    # title_color: top_app_bar.specific_text_color
 
                 DrawerClickableItem:
-                    id: change_language:
+                    id: change_language
                     icon: 'web'
                     text: 'Mudar idioma'
                     on_release: root.show_list_bottom_sheet()
@@ -95,7 +95,7 @@
                     id: save_button
                     icon: "content-save"
                     text: "Salvar áudio"
-                    on_release: toast("Ainda estamos a trabalhar nisto")  # root.callback_for_saved_audio()
+                    on_release: root.callback_for_saved_audio()
 
                 MDBoxLayout:
                     size_hint: None, None
@@ -109,7 +109,7 @@
                     MDSwitch:
                         id: switch_color
                         text: 'Dark Mode'
-                        on_active: toast("Ainda estamos a trabalhar nisto")  # app.on_dark_mode_active()
+                        on_active: app.set_dark_theme()
                         thumb_color_inactive: 'gray'
                         pos_hint_right: '1'
 
